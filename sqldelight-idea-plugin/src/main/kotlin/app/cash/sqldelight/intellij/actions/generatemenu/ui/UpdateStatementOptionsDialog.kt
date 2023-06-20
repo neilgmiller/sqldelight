@@ -56,20 +56,18 @@ class UpdateStatementOptionsDialog(
   private fun setDefaultSelections(
     createStatement: SqlCreateTableStmt
   ) {
+    val primaryKeyIndices = createStatement.getPrimaryKeyIndices()
+    val nonPrimaryKeyColumns = createStatement.columnDefList.filterIndexed { index, _ -> !primaryKeyIndices.contains(index) }
     updateColumnListModel.replaceAll(
-      createStatement.columnDefList.filter { columnDef ->
-        !columnDef.columnConstraintList.any { columnConstraint ->
-          columnConstraint.textMatches("PRIMARY KEY")
-        }
-      }.map { it.columnName.name }
+      nonPrimaryKeyColumns.map { it.columnName.name }
     )
 
-    updateColumnList.addSelectionInterval(0, updateColumnListModel.size - 1)
+    updateColumnList.addSelectionInterval(0, nonPrimaryKeyColumns.size - 1)
 
     whereColumnListModel.replaceAll(
       createStatement.columnDefList.map { it.columnName.name }
     )
-    createStatement.getPrimaryKeyIndices().forEach { index ->
+    primaryKeyIndices.forEach { index ->
       whereColumnList.addSelectionInterval(index, index)
     }
   }
