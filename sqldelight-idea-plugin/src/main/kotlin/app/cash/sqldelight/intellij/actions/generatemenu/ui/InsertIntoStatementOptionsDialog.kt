@@ -53,7 +53,10 @@ class InsertIntoStatementOptionsDialog(
     val columnDefList = selectedCreateStatement.columnDefList
     view.columnList.addSelectionInterval(0, columnDefList.size - 1)
 
-    selectedCreateStatement.getPrimaryKeyIndices().forEach { index ->
+    // auto-deselect primary key, if there's just one
+    val primaryKeyIndices = selectedCreateStatement.getPrimaryKeyIndices()
+    if (primaryKeyIndices.size == 1) {
+      val index = primaryKeyIndices[0]
       view.columnList.removeSelectionInterval(index, index)
     }
   }
